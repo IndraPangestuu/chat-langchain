@@ -13,13 +13,24 @@ from backend.constants import WEAVIATE_GENERAL_GUIDES_AND_TUTORIALS_INDEX_NAME
 
 
 def make_text_encoder(model: str) -> Embeddings:
-    """Connect to the configured text encoder."""
-    provider, model = model.split("/", maxsplit=1)
+    """Connect to the configured text encoder.
+    
+    Supports OpenAI-compatible APIs via OPENAI_API_BASE environment variable.
+    """
+    provider, model_name = model.split("/", maxsplit=1)
     match provider:
         case "openai":
             from langchain_openai import OpenAIEmbeddings
-
-            return OpenAIEmbeddings(model=model)
+            
+            # Support for OpenAI-compatible APIs (like api.algion.dev)
+            openai_api_base = os.environ.get("OPENAI_API_BASE")
+            if openai_api_base:
+                return OpenAIEmbeddings(
+                    model=model_name,
+                    openai_api_base=openai_api_base,
+                    openai_api_key=os.environ.get("OPENAI_API_KEY"),
+                )
+            return OpenAIEmbeddings(model=model_name)
         case _:
             raise ValueError(f"Unsupported embedding provider: {provider}")
 

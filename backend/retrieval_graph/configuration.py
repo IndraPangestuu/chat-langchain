@@ -15,16 +15,16 @@ class AgentConfiguration(BaseConfiguration):
     # models
 
     query_model: str = field(
-        default="anthropic/claude-3-5-haiku-20241022",
+        default="openai/gpt-4o-mini",
         metadata={
-            "description": "The language model used for processing and refining queries. Should be in the form: provider/model-name."
+            "description": "The language model used for processing and refining queries. Should be in the form: provider/model-name. Available models from api.algion.dev: gpt-5.1, gpt-5, gpt-5-mini, gpt-4.1, gpt-4o, gpt-4o-mini, claude-sonnet-4.5, claude-haiku-4.5, gemini-2.5-pro"
         },
     )
 
     response_model: str = field(
-        default="anthropic/claude-3-5-haiku-20241022",
+        default="openai/gpt-4o-mini",
         metadata={
-            "description": "The language model used for generating responses. Should be in the form: provider/model-name."
+            "description": "The language model used for generating responses. Should be in the form: provider/model-name. Available models from api.algion.dev: gpt-5.1, gpt-5, gpt-5-mini, gpt-4.1, gpt-4o, gpt-4o-mini, claude-sonnet-4.5, claude-haiku-4.5, gemini-2.5-pro"
         },
     )
 

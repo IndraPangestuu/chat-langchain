@@ -5,6 +5,7 @@ Functions:
     load_chat_model: Load a chat model from a model name.
 """
 
+import os
 import uuid
 from typing import Any, Literal, Optional, Union
 
@@ -69,6 +70,12 @@ def load_chat_model(fully_specified_name: str) -> BaseChatModel:
 
     Args:
         fully_specified_name (str): String in the format 'provider/model'.
+    
+    Supports OpenAI-compatible APIs via OPENAI_API_BASE environment variable.
+    Available models from api.algion.dev:
+        - gpt-5.1, gpt-5, gpt-5-mini, gpt-4.1, gpt-4o, gpt-4o-mini, gpt-4, gpt-3.5-turbo
+        - claude-opus-4.5, claude-sonnet-4, claude-sonnet-4.5, claude-haiku-4.5
+        - grok-code-fast-1, gemini-3-pro-preview, gemini-2.5-pro
     """
     if "/" in fully_specified_name:
         provider, model = fully_specified_name.split("/", maxsplit=1)
@@ -77,8 +84,24 @@ def load_chat_model(fully_specified_name: str) -> BaseChatModel:
         model = fully_specified_name
 
     model_kwargs = {"temperature": 0, "stream_usage": True}
+    
+    # Support for OpenAI-compatible APIs (like api.algion.dev)
+    openai_api_base = os.environ.get("OPENAI_API_BASE")
+    
+    if provider == "openai" and openai_api_base:
+        # Use OpenAI-compatible endpoint
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            model=model,
+            temperature=0,
+            openai_api_base=openai_api_base,
+            openai_api_key=os.environ.get("OPENAI_API_KEY"),
+            streaming=True,
+        )
+    
     if provider == "google_genai":
         model_kwargs["convert_system_message_to_human"] = True
+    
     return init_chat_model(model, model_provider=provider, **model_kwargs)
 
 
